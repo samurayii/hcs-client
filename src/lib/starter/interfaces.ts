@@ -6,3 +6,9 @@ export interface IStarter extends EventEmitter {
     restart: () => void
     readonly close: boolean
 }
+
+export interface IStarterConfig {
+    exec: string
+    cwd: string
+    restart_interval: number
+}

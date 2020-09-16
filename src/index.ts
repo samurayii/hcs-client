@@ -1,13 +1,7 @@
 #!/usr/bin/env node
 import config from "./lib/entry";
 import { Logger } from "logger-flx";
-import { Starter } from "./lib/starter";
-
-
-
-console.log(config);
-
-
+import { IStarterConfig, Starter } from "./lib/starter";
 
 const logger = new Logger({
     mode: "prod",
@@ -16,15 +10,36 @@ const logger = new Logger({
     enable: true
 });
 
-const starter = new Starter(config.exec, config.cwd, logger);
+console.log(config);
 
 
 
 
-process.on("SIGTERM", () => {
-    console.log("💀 Termination signal received 💀");
-    starter.stop();
-    setTimeout( () => {
+
+
+
+
+if (config.exec !== undefined) {
+
+    const starter_config: IStarterConfig = {
+        exec: config.exec,
+        cwd: config.cwd,
+        restart_interval: config.restart_interval
+    };
+
+    const starter = new Starter(starter_config, logger);
+
+    starter.on("close", () => {
         process.exit();
-    }, 500);
-});
+    });
+
+    starter.on("error", () => {
+        process.exit(1);
+    });
+
+    process.on("SIGTERM", () => {
+        console.log("💀 Termination signal received 💀");
+        starter.stop();
+    });
+
+}
