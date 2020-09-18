@@ -11,14 +11,27 @@ export interface IConnectorConfig {
     update: boolean
 }
 
+export interface IConnectorSourceHashesResult {
+    namespace: string
+    exist: boolean
+    file: string
+    hash: string
+}
+
+export interface IConnectorSourceFileResult {
+    namespace: string
+    path: string
+    body: string
+}
+
+export interface IConnectorSourceListResult {
+    namespace: string
+    path: string
+    list: string[]
+}
+
 export interface IConnectorSource {
-    //getFile: (url: string) => Promise<string>
-    getList: (url: string) => Promise<string[]>
-    /*
-    getHashes: (files: string[]) => Promise<{
-        exist: boolean
-        file: string
-        hash: string
-    }[]>
-    */
+    getFile: (url: string) => Promise<IConnectorSourceFileResult>
+    getList: (url: string) => Promise<IConnectorSourceListResult>
+    getHashes: (files: string[]) => Promise<IConnectorSourceHashesResult[]>
 }

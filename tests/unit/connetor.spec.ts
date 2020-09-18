@@ -26,9 +26,52 @@ describe("Connector", function() {
 
             source.getList("git1/app_folder").then( (files_list) => {
                 
-                expect(files_list).to.be.an("array");
+                expect(files_list).to.be.an("object");
+                expect(files_list.list).to.be.an("array");
 
                 done();
+
+            }).catch( (error) => {
+                done(error);
+            });
+
+        });
+
+        it("getFile", function(done) {
+
+            const source = new HttpSource("http://localhost:3001/api/", logger);
+
+            source.getFile("git1/app2/config.toml").then( (data) => {
+                
+                expect(data).to.be.an("object");
+                expect(data.body).to.be.an("string");
+
+                done();
+
+            }).catch( (error) => {
+                done(error);
+            });
+
+        });
+
+        it("getHashes", function(done) {
+
+            const source = new HttpSource("http://localhost:3001/api/", logger);
+
+            source.getList("git1/app_folder").then( (files_list) => {
+            
+                expect(files_list).to.be.an("object");
+                expect(files_list.list).to.be.an("array");
+
+                source.getHashes(files_list.list).then( (hashes_list) => {
+
+                    expect(hashes_list).to.be.an("array");
+
+                    done();
+
+                }).catch( (error) => {
+                    done(error);
+                });
 
             }).catch( (error) => {
                 done(error);
