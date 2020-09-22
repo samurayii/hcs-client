@@ -17,8 +17,9 @@ export class Connector extends EventEmitter implements IConnector {
 
     private readonly _targets: {
         [key: string]: {
-            target: string,
-            destination: string,
+            target: string
+            destination: string
+            directory: boolean
             files: {
                 [key: string]: {
                     path: string
@@ -58,6 +59,7 @@ export class Connector extends EventEmitter implements IConnector {
             this._targets[target] = {
                 target: target,
                 destination: destination,
+                directory: false,
                 files: {}
             };
 
@@ -81,31 +83,42 @@ export class Connector extends EventEmitter implements IConnector {
 
     }
 
-    run (): void {
+    run (): Promise<void> {
+        return new Promise( async (resolve) => {
 
-        if (this._running_flag === true) {
-            return;
-        }
+            if (this._running_flag === true) {
+                return resolve();
+            }
+    
+            this._running_flag = true;
 
-        this._running_flag = true;
 
-        this._sync().catch( (error) => {
-            this._logger.error(`[Connector] Problem synchronization. ${error}`);
-            this._logger.error(error.stack, "debug");
-        }).finally( () => {
-
+            try {
+                await this._sync();
+            } catch (error) {
+                this._logger.error(`[HCL-Client] Problem synchronization. ${error}`);
+                this._logger.error(error.stack, "debug");
+            }
+    
             this._running_flag = false;
-
+    
             if (this._config.update === true && this._stopping_flag === false) {
-                this._id_interval = setInterval( () => {
+
+                this._logger.log(`[HCL-Client] New cycle synchronization after ${this._config.interval} sec`, "dev");
+
+                this._id_interval = setTimeout( () => {
                     this.run();
                 }, this._config.interval * 1000);
             }
+
+            resolve();
 
         });
     }
 
     async _sync (): Promise<void> {
+
+        this._logger.log("[HCL-Client] Synchronization running", "dev");
 
         let update_files_flag = false;
 
@@ -115,7 +128,6 @@ export class Connector extends EventEmitter implements IConnector {
                 targets_item.files[client_file_key].check = false;
             }
         }
-
 
         for (const target_name in this._targets) {
 
@@ -130,17 +142,17 @@ export class Connector extends EventEmitter implements IConnector {
                 const directory_flag = data.directory;
                 const files_list = data.list;
                 const hashes_list = await this._source.getHashes(files_list);
-                
+
+                targets_item.directory = directory_flag;
+             
                 for (const hashes_item of hashes_list) {
 
                     if (hashes_item.exist === false) {
-                        break;
+                        continue;
                     }
 
-                    let new_file_flag = false;
-
                     if (client_files[hashes_item.file] === undefined) {
-                        new_file_flag = true;
+                        this._logger.log(`[HCL-Client] Detected new file ${hashes_item.file} on server`, "dev");
                     } else {
 
                         const client_file = client_files[hashes_item.file];
@@ -148,14 +160,10 @@ export class Connector extends EventEmitter implements IConnector {
                         client_file.check = true;
 
                         if (client_file.hash === hashes_item.hash) {
-                            break;
+                            continue;
                         } else {
-                            update_files_flag = true;
+                            this._logger.log(`[HCL-Client] Detected new hash for file ${hashes_item.file} on server`, "dev");
                         }
-                    }
-
-                    if (new_file_flag === false) {
-                        break;
                     }
 
                     update_files_flag = true;
@@ -181,7 +189,7 @@ export class Connector extends EventEmitter implements IConnector {
                 }          
     
             } catch (error) {
-                this._logger.error(`[Connector] Synchronization problem for target ${target}. ${error}`);
+                this._logger.error(`[HCL-Client] Synchronization problem for target ${target}. ${error}`);
                 this._logger.log(error.stack, "debug");
                 break;
             }
@@ -200,8 +208,11 @@ export class Connector extends EventEmitter implements IConnector {
         }
 
         if (update_files_flag === true) {
+            this._logger.log("[HCL-Client] Change detected on server", "dev");
             this.emit("change");
         }
+
+        this._logger.log("[HCL-Client] Synchronization completed", "dev");
 
     }
 
@@ -219,11 +230,14 @@ export class Connector extends EventEmitter implements IConnector {
 
         fs.writeFileSync(file_path, body);
 
+        this._logger.log(`[HCL-Client] Saved file ${file_path}`, "dev");
+
     }
 
     private _deleteFile (file_path: string): void {
         if (fs.existsSync(file_path)) {
             fs.unlinkSync(file_path);
+            this._logger.log(`[HCL-Client] Deleted file ${file_path}`, "dev");
         }
     }
 
@@ -234,13 +248,13 @@ export class Connector extends EventEmitter implements IConnector {
             const full_key_path = path.resolve(process.cwd(), key_path.replace(/\/$/,""));
 
             if (!fs.existsSync(full_key_path)) {
-                this._logger.error(`[Connector] Key file ${full_key_path} not found`);
+                this._logger.error(`[HCL-Client] Key file ${full_key_path} not found`);
                 process.exit(1);
             }
 
             let keys_file_text = fs.readFileSync(key_path).toString();
 
-            this._logger.log(`[Connector] Loading key file ${key_path}`, "dev");
+            this._logger.log(`[HCL-Client] Loading key file ${key_path}`, "dev");
 
             for (const env_name in process.env) {
     
@@ -255,7 +269,7 @@ export class Connector extends EventEmitter implements IConnector {
             for (const key_name in keys_file_json) {
 
                 if (!/^[a-zA-Z]{1}[-a-zA-Z0-9_]{0,31}$/gi.test(key_name)) {
-                    this._logger.warn(`[Connector] Key ${key_name} not match regexp ^[a-zA-Z]{1}[-a-zA-Z0-9_]{0,31}$`);
+                    this._logger.warn(`[HCL-Client] Key ${key_name} not match regexp ^[a-zA-Z]{1}[-a-zA-Z0-9_]{0,31}$`);
                     continue;
                 }
     
@@ -284,6 +298,8 @@ export class Connector extends EventEmitter implements IConnector {
                 }
 
                 this._keys[`client.${key_name}`] = value;
+
+                this._logger.log(`[HCL-Client] Key "${key_name}" initialized to "client.${key_name}"`, "dev");
 
             }
 

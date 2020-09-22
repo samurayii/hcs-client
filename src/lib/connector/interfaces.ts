@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 
 export interface IConnector extends EventEmitter {
-    run: () => void
+    run: () => Promise<void>
     stop: () => void
 }
 

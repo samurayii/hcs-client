@@ -119,7 +119,7 @@ if (!Array.isArray(config.keys)) {
     config.keys = [];
 }
 
-if (config.logs !== "prod" && config.logs !== "dev" && config.logs === "debug") {
+if (config.logs !== "prod" && config.logs !== "dev" && config.logs !== "debug") {
     console.error(chalk.red("[ERROR] Logs must be prod, dev or debug"));
     process.exit(1);
 }
