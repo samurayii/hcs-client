@@ -11,4 +11,5 @@ export interface IStarterConfig {
     exec: string
     cwd: string
     restart_interval: number
+    webhook?: string
 }

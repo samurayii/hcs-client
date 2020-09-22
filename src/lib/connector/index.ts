@@ -128,7 +128,6 @@ export class Connector extends EventEmitter implements IConnector {
                 targets_item.files[client_file_key].check = false;
             }
         }
-
         for (const target_name in this._targets) {
 
             const targets_item = this._targets[target_name];
@@ -144,7 +143,7 @@ export class Connector extends EventEmitter implements IConnector {
                 const hashes_list = await this._source.getHashes(files_list);
 
                 targets_item.directory = directory_flag;
-             
+            
                 for (const hashes_item of hashes_list) {
 
                     if (hashes_item.exist === false) {
