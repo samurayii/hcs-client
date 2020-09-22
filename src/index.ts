@@ -4,7 +4,7 @@ import { Logger } from "logger-flx";
 import { IStarterConfig, Starter } from "./lib/starter";
 
 const logger = new Logger({
-    mode: "prod",
+    mode: config.logs,
     type: true,
     timestamp: "none",
     enable: true

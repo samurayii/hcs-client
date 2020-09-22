@@ -87,12 +87,51 @@ describe("Connector", function() {
             url: "http://localhost:3001/api/",
             target: ["/git1/config.json:/git1/config.json"],
             interval: 5,
-            update: false
+            update: false,
+            keys: []
         };
 
         new Connector(connector_config, logger);
     });
 
+    it("run", function(done) {
 
+        const connector_config: IConnectorConfig = {
+            url: "http://localhost:3001/api/",
+            target: ["/git1/config.json:tmp/config.json", "/git1/app2:tmp/app2"],
+            interval: 5,
+            update: false,
+            keys: []
+        };
+
+        const connector = new Connector(connector_config, logger);
+
+        connector.run();
+
+        setTimeout( () => {
+            connector.stop();
+            done();
+        }, 500);
+    });
+
+    it("run (with keys)", function(done) {
+
+        const connector_config: IConnectorConfig = {
+            url: "http://localhost:3001/api/",
+            target: ["/git1/config.json:tmp/config.json", "/git1/app2:tmp/app2"],
+            interval: 5,
+            update: false,
+            keys: ["./tests/keys/keys1.json", "./tests/keys/keys2.toml",]
+        };
+
+        const connector = new Connector(connector_config, logger);
+
+        connector.run();
+
+        setTimeout( () => {
+            connector.stop();
+            done();
+        }, 500);
+    });
 
 });

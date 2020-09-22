@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 
 export interface IConnector extends EventEmitter {
     run: () => void
+    stop: () => void
 }
 
 export interface IConnectorConfig {
@@ -9,6 +10,7 @@ export interface IConnectorConfig {
     target: string[]
     interval: number
     update: boolean
+    keys: string[]
 }
 
 export interface IConnectorSourceHashesResult {
@@ -27,7 +29,12 @@ export interface IConnectorSourceFileResult {
 export interface IConnectorSourceListResult {
     namespace: string
     path: string
+    directory: boolean
     list: string[]
+}
+
+export interface IConnectorKeys {
+    [key: string]: string
 }
 
 export interface IConnectorSource {
