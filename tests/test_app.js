@@ -13,6 +13,7 @@ for (const key in process.env) {
     console.log(`  ${key} = ${process.env[key]}`);
 }
 */
+
 const server = http.createServer((req, res) => {
 
     console.log(`received http request: ${req.url}`);
@@ -20,6 +21,10 @@ const server = http.createServer((req, res) => {
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/plain");
     res.end(`Hello this is ${app_name}`);
+
+    if (req.url === "/webhook") {
+        process.exit();
+    }
 
 });
 

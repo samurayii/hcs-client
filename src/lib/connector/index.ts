@@ -188,8 +188,10 @@ export class Connector extends EventEmitter implements IConnector {
                 }          
     
             } catch (error) {
-                this._logger.error(`[HCL-Client] Synchronization problem for target ${target}. ${error}`);
-                this._logger.log(error.stack, "debug");
+                this._logger.error(`[HCL-Client] Synchronization problem for target ${target}.`);
+                if (error.stack) {
+                    this._logger.log(error, "debug");
+                }
                 break;
             }
 

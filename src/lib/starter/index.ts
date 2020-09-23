@@ -114,7 +114,7 @@ export class Starter extends EventEmitter implements IStarter {
     }
 
     restart (): void {
-
+console.log("restart");
         if (this._restarting_flag === true || this._closed_flag === true || this._stopping_flag === true) {
             return;
         }
@@ -124,7 +124,7 @@ export class Starter extends EventEmitter implements IStarter {
         this._restarting_flag = true;
 
         clearTimeout(this._id_interval);
-
+console.log("webhook", this._config.webhook);
         if (this._config.webhook !== undefined) {
 
             axios.get(this._config.webhook).catch( (error) => {

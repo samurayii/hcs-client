@@ -30,7 +30,8 @@ const bootstrap = async () => {
         const starter_config: IStarterConfig = {
             exec: config.exec,
             cwd: config.cwd,
-            restart_interval: config.restart_interval
+            restart_interval: config.restart_interval,
+            webhook: config.webhook
         };
 
         const starter = new Starter(starter_config, logger);

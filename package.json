@@ -1,6 +1,6 @@
 {
     "name": "hcs-client",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Client for http config server",
     "main": "index.js",
     "directories": {
@@ -18,6 +18,7 @@
         "start:dev": "ts-node ./src/index.ts -u http://localhost:3001/api/ -l debug -i 5 -k ./tests/keys/keys1.json ./tests/keys/keys2.toml -t /git1/config.json:tmp/config.json /git1/app2:tmp/app2",
         "start": "node ./dist/index.js -u http://localhost:3001/api/ -l debug -i 5 -k ./tests/keys/keys1.json ./tests/keys/keys2.toml -t /git1/config.json:tmp/config.json /git1/app2:tmp/app2",
         "start:dev:update": "ts-node ./src/index.ts -u http://localhost:3001/api/ -e \"node ./tests/test_app.js\" -up -l debug -i 5 -k ./tests/keys/keys1.json ./tests/keys/keys2.toml -t /git1/config.json:tmp/config.json /git1/app2:tmp/app2",
+        "start:dev:webhook": "ts-node ./src/index.ts -w http://localhost:6001/webhook -u http://localhost:3001/api/ -e \"node ./tests/test_app.js\" -up -l debug -i 5 -k ./tests/keys/keys1.json ./tests/keys/keys2.toml -t /git1/config.json:tmp/config.json /git1/app2:tmp/app2",
         "test": "mocha -r ts-node/register --config ./tests/mocha.unit.config.json"
     },
     "repository": {

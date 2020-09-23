@@ -16,6 +16,8 @@ export class HttpSource implements IConnectorSource {
 
             const url = `${this._url_server}/v1/store/list/${url_file}`;
 
+            this._logger.log(`[HCL-Client] Request: ${url}`, "dev");
+
             axios.get(url).then( (response) => {
 
                 const body = response.data;
@@ -46,6 +48,8 @@ export class HttpSource implements IConnectorSource {
 
             const url = `${this._url_server}/v1/store/get/${url_file}`;
 
+            this._logger.log(`[HCL-Client] Request: ${url}`, "dev");
+
             axios.get(url).then( (response) => {
 
                 const body = response.data;
@@ -75,6 +79,8 @@ export class HttpSource implements IConnectorSource {
         return new Promise( (resolve, reject) => {
 
             const url = `${this._url_server}/v1/store/hashes`;
+
+            this._logger.log(`[HCL-Client] Request: ${url}`, "dev");
 
             axios.post(url, url_files).then( (response) => {
 
