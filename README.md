@@ -32,6 +32,6 @@
 -ri, --restart_interval | HCS_CLIENT_RESTART_INTERVAL | интервал перезагрузки приложения (необходим ключ **exec**)
 -t, --target | HCS_CLIENT_TARGET | массив файлов/папок для синхронизации (формат: <ссылка на сервере>:<ссылка назначения>)
 -c, --cwd | HCS_CLIENT_CWD | рабочая папка для приложения (необходим ключ **exec**)
--up, --update | HCS_CLIENT_UPDATE | вызвать справку по ключам запуска (необходим ключ **exec**)
+-up, --update | HCS_CLIENT_UPDATE | слежка за изменениями файлов  (необходим ключ **exec**)
 -l, --logs | HCS_CLIENT_LOGS | уровень логов **prod**, **dev** или **debug** (по умолчанию prod)
 -k, --keys | HCS_CLIENT_KEYS | массив файлов ключей в формате json или toml. Переменые клиента имеют префикс **client.**
