@@ -9,5 +9,6 @@ export interface IAppConfig {
     update: boolean
     keys: string[]
     logs: string,
-    critical: boolean
+    critical: boolean,
+    [key: string]: string | number | string[] | boolean
 }

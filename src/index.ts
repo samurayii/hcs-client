@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import * as chalk from "chalk";
 import config from "./lib/entry";
 import { Logger } from "logger-flx";
 import { IStarterConfig, Starter } from "./lib/starter";
@@ -18,6 +19,12 @@ const connector_config: IConnectorConfig = {
     url: config.url,
     keys: config.keys
 };
+
+logger.log(chalk.bold.white.bgGray("hcs-client config:"), "debug");
+
+for (const key in config) {
+    logger.log(chalk.bold.white.bgGray(`${key} = ${config[key]}`));
+} 
 
 const bootstrap = async () => {
 
@@ -51,9 +58,7 @@ const bootstrap = async () => {
             process.exit();
         });
 
-        starter.on("error", (error) => {
-            logger.error(error.message);
-            logger.log(error.stack);
+        starter.on("error", () => {
             process.exit(1);
         });
 
