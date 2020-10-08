@@ -18,6 +18,7 @@ program.option("-ri, --restart_interval <number>", "Restart interval app (Enviro
 program.option("-t, --target [letters...]", "Watching string/array of string files path (Environment variable: HCS_CLIENT_TARGET=<string[]>). Example: --target /configs/app_config.json:/configs/app_config.json");
 program.option("-c, --cwd <type>", "Path to workdir (Environment variable: HCS_CLIENT_CWD=<type>). Example: --tmp /my_cwd", `${process.cwd()}`);
 program.option("-up, --update", "Flag for watch targets update (Environment variable: HCS_CLIENT_UPDATE=(true|false)).", false);
+program.option("-cr, --critical", "Flag for critical process (Environment variable: HCS_CLIENT_CRITICAL=(true|false)).", false);
 program.option("-l, --logs <type>", "Logs details, can be prod, dev or debug (Environment variable: HCS_CLIENT_LOGS=<type>). Example: --logs prod", "prod");
 program.option("-k, --keys [letters...]", "String/array path to keys file. (Environment variable: HCS_CLIENT_KEYS=<string[]>). Example: --keys /keys.json /keys.toml");
 
@@ -33,7 +34,8 @@ const config: IAppConfig = {
     cwd: program.cwd,
     update: program.update,
     logs: program.logs,
-    keys: program.keys
+    keys: program.keys,
+    critical: program.critical
 };
 
 if (process.env["HCS_CLIENT_WEBHOOK"] !== undefined) {
@@ -70,6 +72,13 @@ if (process.env["HCS_CLIENT_UPDATE"] !== undefined) {
 }
 if (process.env["HCS_CLIENT_CWD"] !== undefined) {
     config.cwd = process.env["HCS_CLIENT_CWD"].trim();
+}
+if (process.env["HCS_CLIENT_CRITICAL"] !== undefined) {
+    if (process.env["HCS_CLIENT_CRITICAL"].trim() === "true") {
+        config.critical = true;
+    } else {
+        config.critical = false;
+    }
 }
 
 if (config.webhook !== undefined) {

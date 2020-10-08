@@ -3,6 +3,7 @@ import { EventEmitter } from "events";
 export interface IConnector extends EventEmitter {
     run: () => Promise<void>
     stop: () => void
+    readonly heathy: boolean
 }
 
 export interface IConnectorConfig {

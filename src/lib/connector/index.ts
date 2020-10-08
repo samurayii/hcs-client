@@ -15,6 +15,8 @@ export * from "./interfaces";
 
 export class Connector extends EventEmitter implements IConnector {
 
+    private _healthy_flag: boolean
+
     private readonly _targets: {
         [key: string]: {
             target: string
@@ -47,6 +49,7 @@ export class Connector extends EventEmitter implements IConnector {
         this._running_flag = false;
         this._stopping_flag = false;
         this._keys = {};
+        this._healthy_flag = false;
 
         for (const item of this._config.target) {
 
@@ -91,7 +94,6 @@ export class Connector extends EventEmitter implements IConnector {
             }
     
             this._running_flag = true;
-
 
             try {
                 await this._sync();
@@ -185,11 +187,14 @@ export class Connector extends EventEmitter implements IConnector {
                         hash: new_hash
                     };
                     
-                }          
-    
+                }
+                
             } catch (error) {
+                this._healthy_flag = false;
                 throw new Error(`[HCL-Client] Synchronization problem for target ${target}. ${error.message}`);
             }
+
+            this._healthy_flag = true;
 
         }
 
@@ -316,5 +321,9 @@ export class Connector extends EventEmitter implements IConnector {
         }
 
         return body;
+    }
+
+    get heathy (): boolean {
+        return this._healthy_flag;
     }
 }

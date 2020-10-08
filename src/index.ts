@@ -27,6 +27,11 @@ const bootstrap = async () => {
 
     if (config.exec !== undefined) {
 
+        if (connector.heathy === false && config.critical === true) {
+            logger.error("[HCL-Client] Connector is unhealthy. Shutdown critical process.");
+            process.exit(1);
+        }
+
         const starter_config: IStarterConfig = {
             exec: config.exec,
             cwd: config.cwd,
@@ -53,7 +58,7 @@ const bootstrap = async () => {
         });
 
         process.on("SIGTERM", () => {
-            console.log("💀 Termination signal received 💀");
+            logger.log("💀 Termination signal received 💀");
             starter.stop();
             connector.stop();
         });

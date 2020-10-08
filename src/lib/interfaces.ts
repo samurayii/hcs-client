@@ -8,5 +8,6 @@ export interface IAppConfig {
     cwd: string
     update: boolean
     keys: string[]
-    logs: string
+    logs: string,
+    critical: boolean
 }
