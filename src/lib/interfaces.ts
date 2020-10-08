@@ -10,5 +10,6 @@ export interface IAppConfig {
     keys: string[]
     logs: string,
     critical: boolean,
+    tmp: string
     [key: string]: string | number | string[] | boolean
 }

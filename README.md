@@ -31,6 +31,7 @@
 -i, --interval | HCS_CLIENT_INTERVAL | интервал проверки обновлений (необходим ключ exec)
 -ri, --restart_interval | HCS_CLIENT_RESTART_INTERVAL | интервал перезагрузки приложения (необходим ключ **exec**)
 -t, --target | HCS_CLIENT_TARGET | массив файлов/папок для синхронизации (формат: <ссылка на сервере>:<ссылка назначения>)
+-tm, --tmp | HCS_CLIENT_TMP | временная папка
 -c, --cwd | HCS_CLIENT_CWD | рабочая папка для приложения (необходим ключ **exec**)
 -up, --update | HCS_CLIENT_UPDATE | слежка за изменениями файлов  (необходим ключ **exec**)
 -cr, --critical | HCS_CLIENT_CRITICAL | флаг критического процесса, он не запуститься если не прошла первичная синхронизация (необходим ключ **exec**)

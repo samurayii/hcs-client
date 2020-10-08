@@ -88,6 +88,7 @@ describe("Connector", function() {
             target: ["/git1/config.json:/git1/config.json"],
             interval: 5,
             update: false,
+            tmp: "tmp_hcs",
             keys: []
         };
 
@@ -101,6 +102,7 @@ describe("Connector", function() {
             target: ["/git1/config.json:tmp/config.json", "/git1/app2:tmp/app2"],
             interval: 5,
             update: false,
+            tmp: "tmp_hcs",
             keys: []
         };
 
@@ -119,16 +121,59 @@ describe("Connector", function() {
             target: ["/git1/config.json:tmp/config.json", "/git1/app2:tmp/app2"],
             interval: 5,
             update: false,
+            tmp: "tmp_hcs",
             keys: ["./tests/keys/keys1.json", "./tests/keys/keys2.toml"]
         };
 
         const connector = new Connector(connector_config, logger);
 
-        connector.run();
+        await connector.run();
+
+        connector.stop();
+
+        expect(connector.heathy).equal(true);
+
+    });
+
+    it("run (empty target)", async function() {
+
+        const connector_config: IConnectorConfig = {
+            url: "http://localhost:3001/api/",
+            target: [],
+            interval: 5,
+            update: false,
+            tmp: "tmp_hcs",
+            keys: ["./tests/keys/keys1.json", "./tests/keys/keys2.toml"]
+        };
+
+        const connector = new Connector(connector_config, logger);
 
         await connector.run();
 
         connector.stop();
+
+        expect(connector.heathy).equal(true);
+
+    });
+
+    it("run (with keys)", async function() {
+
+        const connector_config: IConnectorConfig = {
+            url: "http://localhost:3001/api/",
+            target: ["/git1/config.json:tmp/config.json", "/git1/app2222:tmp/app2"],
+            interval: 5,
+            update: false,
+            tmp: "tmp_hcs",
+            keys: ["./tests/keys/keys1.json", "./tests/keys/keys2.toml"]
+        };
+
+        const connector = new Connector(connector_config, logger);
+
+        await connector.run();
+
+        connector.stop();
+
+        expect(connector.heathy).equal(false);
 
     });
 

@@ -16,7 +16,8 @@ program.option("-w, --webhook <type>", "Url to webhook application (Environment 
 program.option("-i, --interval <number>", "Interval checking files/folders in seconds (Environment variable: HCS_CLIENT_INTERVAL=<number>). Example: --interval 10", "10");
 program.option("-ri, --restart_interval <number>", "Restart interval app (Environment variable: HCS_CLIENT_RESTART_INTERVAL=<number>). Example: --restart_interval 2", "2");
 program.option("-t, --target [letters...]", "Watching string/array of string files path (Environment variable: HCS_CLIENT_TARGET=<string[]>). Example: --target /configs/app_config.json:/configs/app_config.json");
-program.option("-c, --cwd <type>", "Path to workdir (Environment variable: HCS_CLIENT_CWD=<type>). Example: --tmp /my_cwd", `${process.cwd()}`);
+program.option("-c, --cwd <type>", "Path to workdir (Environment variable: HCS_CLIENT_CWD=<type>). Example: --cwd /my_cwd", `${process.cwd()}`);
+program.option("-tm, --tmp <type>", "Path to tmp dir (Environment variable: HCS_CLIENT_TMP=<type>). Example: --tmp /my_tmp", "tmp_hcs");
 program.option("-up, --update", "Flag for watch targets update (Environment variable: HCS_CLIENT_UPDATE=(true|false)).", false);
 program.option("-cr, --critical", "Flag for critical process (Environment variable: HCS_CLIENT_CRITICAL=(true|false)).", false);
 program.option("-l, --logs <type>", "Logs details, can be prod, dev or debug (Environment variable: HCS_CLIENT_LOGS=<type>). Example: --logs prod", "prod");
@@ -33,9 +34,10 @@ const config: IAppConfig = {
     target: program.target,
     cwd: program.cwd,
     update: program.update,
-    logs: program.logs,
+    logs: program.logs.toLowerCase(),
     keys: program.keys,
-    critical: program.critical
+    critical: program.critical,
+    tmp: program.tmp
 };
 
 if (process.env["HCS_CLIENT_WEBHOOK"] !== undefined) {
@@ -57,14 +59,14 @@ if (process.env["HCS_CLIENT_TARGET"] !== undefined) {
     config.target = JSON.parse(process.env["HCS_CLIENT_TARGET"].trim());
 }
 if (process.env["HCS_CLIENT_LOGS"] !== undefined) {
-    config.logs = process.env["HCS_CLIENT_LOGS"].trim();
+    config.logs = process.env["HCS_CLIENT_LOGS"].trim().toLowerCase();
 }
 if (process.env["HCS_CLIENT_KEYS"] !== undefined) {
     config.keys = JSON.parse(process.env["HCS_CLIENT_KEYS"].trim());
 }
 
 if (process.env["HCS_CLIENT_UPDATE"] !== undefined) {
-    if (process.env["HCS_CLIENT_UPDATE"].trim() === "true") {
+    if (process.env["HCS_CLIENT_UPDATE"].trim().toLowerCase() === "true") {
         config.update = true;
     } else {
         config.update = false;
@@ -73,8 +75,11 @@ if (process.env["HCS_CLIENT_UPDATE"] !== undefined) {
 if (process.env["HCS_CLIENT_CWD"] !== undefined) {
     config.cwd = process.env["HCS_CLIENT_CWD"].trim();
 }
+if (process.env["HCS_CLIENT_TMP"] !== undefined) {
+    config.tmp = process.env["HCS_CLIENT_TMP"].trim();
+}
 if (process.env["HCS_CLIENT_CRITICAL"] !== undefined) {
-    if (process.env["HCS_CLIENT_CRITICAL"].trim() === "true") {
+    if (process.env["HCS_CLIENT_CRITICAL"].trim().toLowerCase() === "true") {
         config.critical = true;
     } else {
         config.critical = false;

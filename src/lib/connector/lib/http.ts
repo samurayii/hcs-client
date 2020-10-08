@@ -58,11 +58,11 @@ export class HttpSource implements IConnectorSource {
                     return resolve(body.data);
                 }
 
-                return reject(new Error (`Request getFile for path ${url_file} return status ${body.status}`));
+                return reject(new Error (`Request getFile for path "${url_file}" return status ${body.status}`));
 
             }).catch( (error) => {
                 if (error.response) {
-                    reject(new Error(`Request to ${url_file} return code ${error.response.status}`));
+                    reject(new Error(`Request to "${url_file}" return code "${error.response.status}"`));
                 } else {
                     if (error.request) {
                         reject(error.request);
@@ -90,11 +90,11 @@ export class HttpSource implements IConnectorSource {
                     return resolve(body.data);
                 }
 
-                return reject(new Error (`Request getHashes return status ${body.status}`));
+                return reject(new Error (`Request getHashes return status "${body.status}"`));
 
             }).catch( (error) => {
                 if (error.response) {
-                    reject(new Error(`Request return code ${error.response.status}`));
+                    reject(new Error(`Request return code "${error.response.status}"`));
                 } else {
                     if (error.request) {
                         reject(error.request);

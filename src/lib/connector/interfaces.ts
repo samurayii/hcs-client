@@ -11,6 +11,7 @@ export interface IConnectorConfig {
     target: string[]
     interval: number
     update: boolean
+    tmp: string
     keys: string[]
 }
 

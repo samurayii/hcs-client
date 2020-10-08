@@ -70,7 +70,7 @@ export class Starter extends EventEmitter implements IStarter {
 
             this._closed_flag = true;
 
-            this._logger.log(`[HCL-Client] App closed, with code ${code}`, "dev");
+            this._logger.log(`[HCL-Client] App closed, with code "${code}"`, "dev");
 
             if (this._stopping_flag === true) {
                 return;
