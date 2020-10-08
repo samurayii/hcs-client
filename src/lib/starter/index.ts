@@ -51,7 +51,7 @@ export class Starter extends EventEmitter implements IStarter {
         const executer = this._config.exec.split(" ").splice(0, 1);
         const args = this._config.exec.split(" ").splice(1, this._config.exec.split(" ").length - 1);
 
-        this._logger.log(`[HCL-Client] Spawn command "${this._config.exec}"`);
+        this._logger.log(`[HCL-Client] Spawn command "${this._config.exec} (workdir: ${this._full_cwd_path}, )"`);
 
         this._app = spawn(`${executer}`, args, {
             cwd: this._full_cwd_path,
