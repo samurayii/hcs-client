@@ -17,6 +17,7 @@ const connector_config: IConnectorConfig = {
     target: config.target,
     interval: config.interval,
     url: config.url,
+    tmp: config.tmp,
     keys: config.keys
 };
 
