@@ -24,7 +24,7 @@ const connector_config: IConnectorConfig = {
 logger.log(chalk.bold.white.bgGray("hcs-client config:"), "debug");
 
 for (const key in config) {
-    logger.log(chalk.bold.white.bgGray(`  ${key} = ${config[key]}`));
+    logger.log(chalk.bold.white.bgGray(`  ${key} = ${config[key]}`), "debug");
 } 
 
 const bootstrap = async () => {
