@@ -35,6 +35,12 @@ export interface IConnectorSourceListResult {
     list: string[]
 }
 
+export interface IConnectorTargetConfig {
+    target: string
+    destination: string
+    tmp: string
+}
+
 export interface IConnectorKeys {
     [key: string]: string
 }
@@ -43,4 +49,10 @@ export interface IConnectorSource {
     getFile: (url: string) => Promise<IConnectorSourceFileResult>
     getList: (url: string) => Promise<IConnectorSourceListResult>
     getHashes: (files: string[]) => Promise<IConnectorSourceHashesResult[]>
+}
+
+export interface IConnectorTarget {
+    sync: () => Promise<boolean>
+    readonly heathy: boolean
+    readonly id: string
 }

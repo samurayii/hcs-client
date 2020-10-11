@@ -3,42 +3,26 @@ import { ILogger } from "logger-flx";
 import { 
     IConnector, 
     IConnectorConfig, 
-    IConnectorKeys, 
-    IConnectorSource 
+    IConnectorKeys,
+    IConnectorTarget
 } from "./interfaces";
 import { HttpSource } from "./lib/http";
 import * as path from "path";
 import * as fs from "fs";
 import jtomler from "jtomler";
+import { ConnectorTarget } from "./lib/target";
+import * as chalk from "chalk";
 
 export * from "./interfaces";
 
 export class Connector extends EventEmitter implements IConnector {
 
-    private _healthy_flag: boolean
-    private readonly _full_tmp_path: string
-
     private readonly _targets: {
-        [key: string]: {
-            target: string
-            destination: string
-            directory: boolean
-            hash_file: string
-            files: {
-                [key: string]: {
-                    path: string
-                    check: boolean
-                    full_path: string
-                    hash: string
-                }
-            }
-        }   
+        [key: string]: IConnectorTarget
     }
-    private readonly _source: IConnectorSource
     private _running_flag: boolean
     private _stopping_flag: boolean
     private _id_interval: ReturnType<typeof setTimeout>
-    private _keys: IConnectorKeys
 
     constructor (
         private readonly _config: IConnectorConfig,
@@ -50,10 +34,9 @@ export class Connector extends EventEmitter implements IConnector {
         this._targets = {};
         this._running_flag = false;
         this._stopping_flag = false;
-        this._keys = {};
-        this._healthy_flag = false;
 
-        this._full_tmp_path = path.resolve(process.cwd(), this._config.tmp);
+        const keys = this._loadKeys();
+        const source = new HttpSource(this._config.url, this._logger);
 
         for (const item of this._config.target) {
 
@@ -63,44 +46,13 @@ export class Connector extends EventEmitter implements IConnector {
             target = target.replace(/(^\/|\/$)/gi, "");
             destination = path.resolve(destination.replace(/\/$/gi, ""));
             
-            const hash_file = `${target.replace(/(\/|\\|\:)/gi, "_")}-${destination.replace(/(\/|\\|\:)/gi, "_")}.json`;
-            const full_hash_file = path.resolve(this._full_tmp_path, hash_file);
-
-            if (fs.existsSync(full_hash_file)) {
-
-                try {
-
-                    const target_body = fs.readFileSync(full_hash_file).toString();
-
-                    this._targets[target] = JSON.parse(target_body);
-
-                    this._logger.log(`[HCL-Client] Body hash for target "${target}" loaded from file "${full_hash_file}"`, "dev");
-
-                } catch (error) {
-                    this._logger.error(`[HCL-Client] Problem synchronization. ${error}`);
-                    this._logger.error(error.stack, "debug");
-                    process.exit(1);
-                }
-
-            } else {
-
-                this._targets[target] = {
-                    target: target,
-                    destination: destination,
-                    directory: false,
-                    hash_file: hash_file,
-                    files: {}
-                };
-
-            }
+            this._targets[target] = new ConnectorTarget(target, {
+                target: target,
+                destination: destination,
+                tmp: this._config.tmp
+            }, keys, source, this._logger);
 
         }
-
-        this._saveTargetHash();
-
-        this._loadKeys();
-
-        this._source = new HttpSource(this._config.url, this._logger);
 
     }
 
@@ -152,102 +104,21 @@ export class Connector extends EventEmitter implements IConnector {
 
         this._logger.log("[HCL-Client] Synchronization running", "dev");
 
-        let update_files_flag = false;
+        let change_flag = false;
 
-        for (const target_name in this._targets) {
-            const targets_item = this._targets[target_name];
-            for (const client_file_key in targets_item.files) {
-                targets_item.files[client_file_key].check = false;
-            }
-        }
-        for (const target_name in this._targets) {
+        for (const target_id in this._targets) {
 
-            const targets_item = this._targets[target_name];
-            const target = targets_item.target;
-            const destination = targets_item.destination;
-            const client_files = targets_item.files;
+            const target = this._targets[target_id];
+            const result = await target.sync();
 
-            try {
-
-                const data = await this._source.getList(target);
-                const directory_flag = data.directory;
-                const files_list = data.list;
-
-                if (files_list.length <= 0) {
-                    this._healthy_flag = false;
-                    throw new Error(`For target "${target}" files list is empty`);
-                }
-
-                const hashes_list = await this._source.getHashes(files_list);
-
-                targets_item.directory = directory_flag;
-            
-                for (const hashes_item of hashes_list) {
-
-                    if (hashes_item.exist === false) {
-                        continue;
-                    }
-
-                    if (client_files[hashes_item.file] === undefined) {
-                        this._logger.log(`[HCL-Client] Detected new file "${hashes_item.file}" on server`, "dev");
-                    } else {
-
-                        const client_file = client_files[hashes_item.file];
-
-                        client_file.check = true;
-
-                        if (client_file.hash === hashes_item.hash) {
-                            continue;
-                        } else {
-                            this._logger.log(`[HCL-Client] Detected new hash for file "${hashes_item.file}" on server`, "dev");
-                        }
-                    }
-
-                    update_files_flag = true;
-
-                    const data = await this._source.getFile(hashes_item.file);
-                    const new_hash = hashes_item.hash;
-                    
-                    let full_file_path = destination;
-
-                    if (directory_flag === true) {
-                        full_file_path = path.resolve(destination, hashes_item.file.replace(`${target_name}/`,""));
-                    }
-
-                    this._saveFile(data.body, full_file_path);
-
-                    client_files[hashes_item.file] = {
-                        path: hashes_item.file,
-                        check: true,
-                        full_path: full_file_path,
-                        hash: new_hash
-                    };
-                    
-                }
-                
-            } catch (error) {
-                this._healthy_flag = false;
-                throw new Error(`${error.message} for target ${target}`);
+            if (result === true) {
+                change_flag = true;
             }
 
         }
 
-        for (const target_name in this._targets) {
-            const targets_item = this._targets[target_name];
-            for (const client_file_key in targets_item.files) {
-                if (targets_item.files[client_file_key].check === false) {
-                    this._deleteFile(targets_item.files[client_file_key].full_path);
-                    delete targets_item.files[client_file_key];
-                    update_files_flag = true;
-                }
-            }
-        }
-
-        this._healthy_flag = true;
-
-        if (update_files_flag === true) {
-            this._logger.log("[HCL-Client] Change detected on server", "dev");
-            this._saveTargetHash();
+        if (change_flag === true) {
+            this._logger.log(`[HCL-Client] ${chalk.cyan("Change detected on server")}`, "dev");
             this.emit("change");
         }
         
@@ -255,32 +126,9 @@ export class Connector extends EventEmitter implements IConnector {
 
     }
 
-    private _saveFile (body: string, file_path: string): void {
-        
-        const dirname = path.dirname(file_path);
+    private _loadKeys (): IConnectorKeys {
 
-        if (!fs.existsSync(dirname)) {
-            fs.mkdirSync(dirname, {
-                recursive: true
-            });
-        }
-
-        body = this._parseKeys(body);
-
-        fs.writeFileSync(file_path, body);
-
-        this._logger.log(`[HCL-Client] Saved file "${file_path}"`, "dev");
-
-    }
-
-    private _deleteFile (file_path: string): void {
-        if (fs.existsSync(file_path)) {
-            fs.unlinkSync(file_path);
-            this._logger.log(`[HCL-Client] Deleted file "${file_path}"`, "dev");
-        }
-    }
-
-    private _loadKeys (): void {
+        const keys: IConnectorKeys = {};
 
         for (const key_path of this._config.keys) {
 
@@ -336,7 +184,7 @@ export class Connector extends EventEmitter implements IConnector {
                     }
                 }
 
-                this._keys[`client.${key_name}`] = value;
+                keys[`client.${key_name}`] = value;
 
                 this._logger.log(`[HCL-Client] Key "${key_name}" initialized to "client.${key_name}"`, "dev");
 
@@ -344,47 +192,20 @@ export class Connector extends EventEmitter implements IConnector {
 
         }
 
-    }
+        return keys;
 
-    private _parseKeys (body: string): string {
-
-        for (const key_name in this._keys) {
-
-            const key = this._keys[key_name];
-            const reg = new RegExp(`<<${key_name}>>`, "gi");
-
-            body = body.replace(reg, key);
-
-        }
-
-        return body;
-    }
-
-    private _saveTargetHash (): void {
-
-        if (!fs.existsSync(this._full_tmp_path)) {
-            fs.mkdirSync(this._full_tmp_path, {
-                recursive: true
-            });
-            this._logger.log(`[HCL-Client] Tmp folder "${this._full_tmp_path}" created"`, "dev");
-        }
-
-        for (const target_name in this._targets) {
-
-            const target = this._targets[target_name];
-            const hash_file = target.hash_file;
-            const full_hash_file = path.resolve(this._full_tmp_path, hash_file);
-            const body = JSON.stringify(target, null, 4);
-    
-            fs.writeFileSync(full_hash_file, body);
-    
-            this._logger.log(`[HCL-Client] Body hash for target "${target_name}" saved to "${full_hash_file}"`, "dev");
-
-        }
-        
     }
 
     get heathy (): boolean {
-        return this._healthy_flag;
+
+        for (const target_id in this._targets) {
+            const target = this._targets[target_id];
+            if (target.heathy === false) {
+                return false;
+            }
+        }
+
+        return true;
+
     }
 }

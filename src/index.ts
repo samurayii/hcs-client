@@ -35,9 +35,13 @@ const bootstrap = async () => {
 
     if (config.exec !== undefined) {
 
-        if (connector.heathy === false && config.critical === true) {
-            logger.error("[HCL-Client] Connector is unhealthy. Shutdown critical process.");
-            process.exit(1);
+        if (connector.heathy === false) {
+            if (config.critical === true) {
+                logger.error("[HCL-Client] Connector is unhealthy. Shutdown critical process.");
+                process.exit(1);
+            } else {
+                logger.warn("[HCL-Client] Connector is unhealthy. Process not critical.");
+            }
         }
 
         const starter_config: IStarterConfig = {

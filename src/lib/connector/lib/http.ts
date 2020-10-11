@@ -1,5 +1,10 @@
 import { ILogger } from "logger-flx";
-import { IConnectorSource, IConnectorSourceFileResult, IConnectorSourceHashesResult, IConnectorSourceListResult } from "../interfaces";
+import { 
+    IConnectorSource, 
+    IConnectorSourceFileResult, 
+    IConnectorSourceHashesResult, 
+    IConnectorSourceListResult 
+} from "../interfaces";
 import axios from "axios";
 
 export class HttpSource implements IConnectorSource {
