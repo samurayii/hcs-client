@@ -28,8 +28,8 @@
 -u, --url | HCS_CLIENT_URL | ссылка на сервер конфигурации (пример: http://config-server:5000/api )
 -e, --exec | HCS_CLIENT_EXEC | строка запуска приложения
 -w, --webhook | HCS_CLIENT_WEBHOOK | ссылка на webhook (если не указан, то используется сигнал **SIGTERM**, необходим ключ **exec**)
--i, --interval | HCS_CLIENT_INTERVAL | интервал проверки обновлений (необходим ключ exec)
--ri, --restart_interval | HCS_CLIENT_RESTART_INTERVAL | интервал перезагрузки приложения (необходим ключ **exec**)
+-i, --interval | HCS_CLIENT_INTERVAL | интервал проверки обновлений в секундах (необходим ключ exec)
+-ri, --restart_interval | HCS_CLIENT_RESTART_INTERVAL | интервал перезагрузки приложения в секундах (необходим ключ **exec**)
 -t, --target | HCS_CLIENT_TARGET | массив файлов/папок для синхронизации (формат: <ссылка на сервере>:<ссылка назначения>)
 -tm, --tmp | HCS_CLIENT_TMP | временная папка
 -c, --cwd | HCS_CLIENT_CWD | рабочая папка для приложения (необходим ключ **exec**)
