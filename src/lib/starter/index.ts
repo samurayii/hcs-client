@@ -54,16 +54,9 @@ export class Starter extends EventEmitter implements IStarter {
         this._logger.log(`[HCL-Client] Spawn command "${this._config.exec}", workdir "${this._full_cwd_path}"`);
 
         this._app = spawn(`${executer}`, [args], {
+            stdio: ["pipe", process.stdout, process.stderr],
             cwd: this._full_cwd_path,
             env: process.env
-        });
-
-        this._app.stdout.on("data", (data) => {
-            console.log(data.toString().trim());
-        });
-
-        this._app.stderr.on("data", (data) => {
-            console.error(data.toString().trim());
         });
 
         this._app.on("close", (code) => {
