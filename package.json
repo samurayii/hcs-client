@@ -1,6 +1,6 @@
 {
     "name": "hcs-client",
-    "version": "0.3.14",
+    "version": "0.3.15",
     "description": "Client for http config server",
     "main": "index.js",
     "directories": {

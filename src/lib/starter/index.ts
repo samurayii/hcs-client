@@ -4,7 +4,7 @@ import { IStarter, IStarterConfig } from "./interfaces";
 import { ILogger } from "logger-flx";
 import { EventEmitter } from "events";
 import { exec } from "child_process";
-import axios from "axios";
+import fetch from "node-fetch";
 
 export * from "./interfaces";
 
@@ -119,9 +119,8 @@ export class Starter extends EventEmitter implements IStarter {
 
         if (this._config.webhook !== undefined) {
 
-            axios.get(this._config.webhook).catch( (error) => {
-                this._logger.log("[HCL-Client] Error GET request");
-                this._logger.log(error);
+            fetch(this._config.webhook).catch( (error) => {
+                this._logger.log(`[HCL-Client] Error webhook request: ${error.message}`);
             });
 
         } else {
