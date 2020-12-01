@@ -25,6 +25,10 @@ export class HttpSource implements IConnectorSource {
 
             fetch(url).then( (response) => {
 
+                if (response.ok === false) {
+                    return reject(new Error (`Http request return ${response.status}. ${response.statusText}`));
+                }
+
                 return response.json();
 
             }).then( (body) => {
@@ -50,6 +54,10 @@ export class HttpSource implements IConnectorSource {
             this._logger.log(`[HCL-Client] Request: ${url}`, "dev");
 
             fetch(url).then( (response) => {
+
+                if (response.ok === false) {
+                    return reject(new Error (`Http request return ${response.status}. ${response.statusText}`));
+                }
 
                 return response.json();
 
@@ -78,7 +86,14 @@ export class HttpSource implements IConnectorSource {
             fetch(url, {
                 method: "post",
                 body: JSON.stringify(url_files),
+                headers: {
+                    "Content-Type": "application/json"
+                }
             }).then( (response) => {
+
+                if (response.ok === false) {
+                    return reject(new Error (`Http request return ${response.status}. ${response.statusText}`));
+                }
 
                 return response.json();
 
