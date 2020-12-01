@@ -1,6 +1,6 @@
 {
     "name": "hcs-client",
-    "version": "0.3.12",
+    "version": "0.3.13",
     "description": "Client for http config server",
     "main": "index.js",
     "directories": {
@@ -41,19 +41,19 @@
         "@types/chai": "^4.2.14",
         "@types/chalk": "^2.2.0",
         "@types/find-package-json": "^1.1.1",
-        "@types/mocha": "^8.0.3",
-        "@types/node": "^14.14.6",
-        "@typescript-eslint/eslint-plugin": "^4.6.0",
-        "@typescript-eslint/parser": "^4.6.0",
+        "@types/mocha": "^8.0.4",
+        "@types/node": "^14.14.10",
+        "@typescript-eslint/eslint-plugin": "^4.9.0",
+        "@typescript-eslint/parser": "^4.9.0",
         "chai": "^4.2.0",
-        "eslint": "^7.12.1",
+        "eslint": "^7.14.0",
         "files-copier": "^0.1.1",
-        "json-key-remover": "^0.0.2",
-        "mocha": "^8.2.0",
-        "npm-check-updates": "^9.2.3",
+        "json-key-remover": "^0.0.3",
+        "mocha": "^8.2.1",
+        "npm-check-updates": "^10.2.2",
         "rimraf": "^3.0.2",
         "ts-node": "^9.0.0",
-        "typescript": "^4.0.5"
+        "typescript": "^4.1.2"
     },
     "dependencies": {
         "axios": "^0.21.0",
@@ -61,7 +61,7 @@
         "commander": "^6.2.0",
         "del": "^6.0.0",
         "find-package-json": "^1.2.0",
-        "jtomler": "^0.1.5",
+        "jtomler": "^0.3.6",
         "logger-flx": "^0.1.5"
     },
     "remover": {
