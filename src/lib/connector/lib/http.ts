@@ -5,7 +5,7 @@ import {
     IConnectorSourceHashesResult, 
     IConnectorSourceListResult 
 } from "../interfaces";
-import axios from "axios";
+import fetch from "node-fetch";
 
 export class HttpSource implements IConnectorSource {
 
@@ -23,9 +23,11 @@ export class HttpSource implements IConnectorSource {
 
             this._logger.log(`[HCL-Client] Request: ${url}`, "dev");
 
-            axios.get(url).then( (response) => {
+            fetch(url).then( (response) => {
 
-                const body = response.data;
+                return response.json();
+
+            }).then( (body) => {
 
                 if (body.status === "success") {
                     return resolve(body.data);
@@ -34,15 +36,7 @@ export class HttpSource implements IConnectorSource {
                 return reject(new Error (`Request getList for path ${url_file} return status ${body.status}`));
 
             }).catch( (error) => {
-                if (error.response) {
-                    reject(new Error(`Request to ${url_file} return code ${error.response.status}`));
-                } else {
-                    if (error.request) {
-                        reject(error.request);
-                    } else {
-                        reject(error);
-                    }
-                }
+                reject(error);
             });
 
         });
@@ -55,9 +49,11 @@ export class HttpSource implements IConnectorSource {
 
             this._logger.log(`[HCL-Client] Request: ${url}`, "dev");
 
-            axios.get(url).then( (response) => {
+            fetch(url).then( (response) => {
 
-                const body = response.data;
+                return response.json();
+
+            }).then( (body) => {
 
                 if (body.status === "success") {
                     return resolve(body.data);
@@ -66,15 +62,7 @@ export class HttpSource implements IConnectorSource {
                 return reject(new Error (`Request getFile for path "${url_file}" return status ${body.status}`));
 
             }).catch( (error) => {
-                if (error.response) {
-                    reject(new Error(`Request to "${url_file}" return code "${error.response.status}"`));
-                } else {
-                    if (error.request) {
-                        reject(error.request);
-                    } else {
-                        reject(error);
-                    }
-                }
+                reject(error);
             });
             
         });
@@ -87,9 +75,14 @@ export class HttpSource implements IConnectorSource {
 
             this._logger.log(`[HCL-Client] Request: ${url}`, "dev");
 
-            axios.post(url, url_files).then( (response) => {
+            fetch(url, {
+                method: "post",
+                body: JSON.stringify(url_files),
+            }).then( (response) => {
 
-                const body = response.data;
+                return response.json();
+
+            }).then( (body) => {
 
                 if (body.status === "success") {
                     return resolve(body.data);
@@ -98,15 +91,7 @@ export class HttpSource implements IConnectorSource {
                 return reject(new Error (`Request getHashes return status "${body.status}"`));
 
             }).catch( (error) => {
-                if (error.response) {
-                    reject(new Error(`Request return code "${error.response.status}"`));
-                } else {
-                    if (error.request) {
-                        reject(error.request);
-                    } else {
-                        reject(error);
-                    }
-                }
+                reject(error);
             });
 
         });

@@ -190,7 +190,7 @@ export class ConnectorTarget implements IConnectorTarget {
 
         } catch (error) {
             this._healthy_flag = false;
-            this._logger.error(`[HCL-Client] Problem synchronization for target ${this._id}. ${error}`);
+            this._logger.error(`[HCL-Client] Problem synchronization for target ${this._id}. Error: ${error.message}`);
             this._logger.log(error.stack, "debug");
             return false;
         }
