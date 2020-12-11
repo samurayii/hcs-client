@@ -3,14 +3,14 @@ import * as path from "path";
 import { IStarter, IStarterConfig } from "./interfaces";
 import { ILogger } from "logger-flx";
 import { EventEmitter } from "events";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import fetch from "node-fetch";
 
 export * from "./interfaces";
 
 export class Starter extends EventEmitter implements IStarter {
 
-    private _app: ReturnType<typeof exec>
+    private _app: ReturnType<typeof spawn>
     private readonly _full_cwd_path: string
     private _stopping_flag: boolean
     private _restarting_flag: boolean
@@ -50,13 +50,12 @@ export class Starter extends EventEmitter implements IStarter {
 
         this._logger.log(`[HCL-Client] Spawn command "${this._config.exec}", workdir "${this._full_cwd_path}"`);
 
-        this._app = exec(this._config.exec.trim(), {
+        this._app = spawn(this._config.exec.trim(), [], {
             cwd: this._full_cwd_path,
-            env: process.env
+            env: process.env,
+            stdio: ["inherit", "inherit", "inherit"],
+            shell: true
         });
-
-        this._app.stdout.pipe(process.stdout);
-        this._app.stderr.pipe(process.stderr);
 
         this._app.on("close", (code) => {
 
