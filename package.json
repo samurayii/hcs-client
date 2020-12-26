@@ -1,6 +1,6 @@
 {
     "name": "hcs-client",
-    "version": "0.3.17",
+    "version": "0.4.17",
     "description": "Client for http config server",
     "main": "index.js",
     "directories": {
@@ -61,6 +61,7 @@
         "commander": "^6.2.0",
         "del": "^6.0.0",
         "find-package-json": "^1.2.0",
+        "fkill": "^7.0.1",
         "jtomler": "^0.3.6",
         "logger-flx": "^0.1.5",
         "node-fetch": "^2.6.1"

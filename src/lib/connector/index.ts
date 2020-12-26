@@ -117,12 +117,12 @@ export class Connector extends EventEmitter implements IConnector {
 
         }
 
+        this._logger.log("[HCL-Client] Synchronization completed", "dev");
+
         if (change_flag === true) {
             this._logger.log(`[HCL-Client] ${chalk.cyan("Change detected on server")}`, "dev");
             this.emit("change");
         }
-        
-        this._logger.log("[HCL-Client] Synchronization completed", "dev");
 
     }
 
@@ -135,13 +135,13 @@ export class Connector extends EventEmitter implements IConnector {
             const full_key_path = path.resolve(process.cwd(), key_path.replace(/\/$/,""));
 
             if (!fs.existsSync(full_key_path)) {
-                this._logger.error(`[HCL-Client] Key file "${full_key_path}" not found`);
+                this._logger.error(`[HCL-Client] Key file ${chalk.grey(full_key_path)} not found`);
                 process.exit(1);
             }
 
             let keys_file_text = fs.readFileSync(key_path).toString();
 
-            this._logger.log(`[HCL-Client] Loading key file "${key_path}"`, "dev");
+            this._logger.log(`[HCL-Client] Loading key file ${chalk.grey(key_path)}`, "dev");
 
             for (const env_name in process.env) {
     
@@ -156,7 +156,7 @@ export class Connector extends EventEmitter implements IConnector {
             for (const key_name in keys_file_json) {
 
                 if (!/^[a-zA-Z]{1}[-a-zA-Z0-9_]{0,31}$/gi.test(key_name)) {
-                    this._logger.warn(`[HCL-Client] Key "${key_name}" not match regexp ^[a-zA-Z]{1}[-a-zA-Z0-9_]{0,31}$`);
+                    this._logger.warn(`[HCL-Client] Key ${chalk.grey(key_name)} not match regexp ^[a-zA-Z]{1}[-a-zA-Z0-9_]{0,31}$`);
                     continue;
                 }
     
@@ -186,7 +186,7 @@ export class Connector extends EventEmitter implements IConnector {
 
                 keys[`client.${key_name}`] = value;
 
-                this._logger.log(`[HCL-Client] Key "${key_name}" initialized to "client.${key_name}"`, "dev");
+                this._logger.log(`[HCL-Client] Key ${chalk.grey(key_name)} initialized to ${chalk.grey(`client.${key_name}`)}`, "dev");
 
             }
 

@@ -68,7 +68,7 @@ const bootstrap = async () => {
         });
 
         process.on("SIGTERM", () => {
-            logger.log("💀 Termination signal received 💀");
+            logger.log("Termination signal received");
             starter.stop();
             connector.stop();
         });

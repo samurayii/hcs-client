@@ -8,7 +8,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { sync as sync_del } from "del";
 import { ILogger } from "logger-flx";
-
+import * as chalk from "chalk";
 
 export class ConnectorTarget implements IConnectorTarget {
     
@@ -50,7 +50,7 @@ export class ConnectorTarget implements IConnectorTarget {
 
                 this._info = JSON.parse(target_body);
 
-                this._logger.log(`[HCL-Client] Body hash for target "${this._config.target}" loaded from file "${full_hash_file}"`, "dev");
+                this._logger.log(`[HCL-Client] Body hash for target ${chalk.grey(this._config.target)} loaded from file ${chalk.grey(full_hash_file)}`, "dev");
 
             } catch (error) {
                 this._logger.error(`[HCL-Client] Problem synchronization. ${error}`);
@@ -76,7 +76,7 @@ export class ConnectorTarget implements IConnectorTarget {
 
             if (!fs.existsSync(full_file_path)) {
                 delete this._info.files[target_file_name];
-                this._logger.warn(`[HCL-Client] File ${full_file_path} for target ${this._id} not found`);
+                this._logger.warn(`[HCL-Client] File ${chalk.grey(full_file_path)} for target ${chalk.grey(this._id)} not found`);
             }
 
         }
@@ -87,7 +87,7 @@ export class ConnectorTarget implements IConnectorTarget {
 
     async sync (): Promise<boolean> {
 
-        this._logger.log(`[HCL-Client] Synchronization for target "${this._id}" running`, "dev");
+        this._logger.log(`[HCL-Client] Synchronization for target ${chalk.grey(this._id)} running`, "dev");
 
         let update_files_flag = false;
         this._healthy_flag = true;
@@ -110,11 +110,11 @@ export class ConnectorTarget implements IConnectorTarget {
 
                 this._healthy_flag = false;
                 
-                this._logger.error(`For target "${this._id}" files list is empty`);
+                this._logger.error(`For target ${chalk.grey(this._id)} files list is empty`);
 
                 if (fs.existsSync(destination)) {
                     sync_del(destination);
-                    this._logger.warn(`[HCL-Client] Deleted destination ${destination}`, "dev");
+                    this._logger.warn(`[HCL-Client] Deleted destination ${chalk.grey(destination)}`, "dev");
                 }
 
                 if (Object.keys(this._info.files).length > 0) {
@@ -178,10 +178,9 @@ export class ConnectorTarget implements IConnectorTarget {
                 }
             }
     
-            this._logger.log(`[HCL-Client] Synchronization for target "${this._id}" completed`, "dev");
+            this._logger.log(`[HCL-Client] Synchronization for target ${chalk.grey(this._id)} completed`, "dev");
     
             if (update_files_flag === true) {
-                this._logger.log("[HCL-Client] Change detected on server", "dev");
                 this._saveTargetHash();
                 return true;
             } else {
@@ -190,7 +189,7 @@ export class ConnectorTarget implements IConnectorTarget {
 
         } catch (error) {
             this._healthy_flag = false;
-            this._logger.error(`[HCL-Client] Problem synchronization for target ${this._id}. Error: ${error.message}`);
+            this._logger.error(`[HCL-Client] Problem synchronization for target ${chalk.grey(this._id)}. Error: ${error.message}`);
             this._logger.log(error.stack, "debug");
             return false;
         }
@@ -203,7 +202,7 @@ export class ConnectorTarget implements IConnectorTarget {
             fs.mkdirSync(this._full_tmp_path, {
                 recursive: true
             });
-            this._logger.log(`[HCL-Client] Tmp folder "${this._full_tmp_path}" created"`, "dev");
+            this._logger.log(`[HCL-Client] Tmp folder ${chalk.grey(this._full_tmp_path)} created"`, "dev");
         }
 
         const files_list = [];
@@ -216,10 +215,10 @@ export class ConnectorTarget implements IConnectorTarget {
 
             this._saveFile(full_hash_file, body);
             files_list.push(hash_file);
-            this._logger.log(`[HCL-Client] Body hash for target "${this._id}" saved to "${full_hash_file}"`, "dev");
+            this._logger.log(`[HCL-Client] Body hash for target ${chalk.grey(this._id)} saved to ${chalk.grey(full_hash_file)}`, "dev");
 
         } catch (error) {
-            this._logger.error(`[HCL-Client] Can not write body hash for target "${this._id}" to file "${full_hash_file}". ${error.message}`);
+            this._logger.error(`[HCL-Client] Can not write body hash for target ${chalk.grey(this._id)} to file ${chalk.grey(full_hash_file)}. ${error.message}`);
             this._logger.log(error.stack, "debug");
         }
         

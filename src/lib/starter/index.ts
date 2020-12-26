@@ -5,6 +5,9 @@ import { ILogger } from "logger-flx";
 import { EventEmitter } from "events";
 import { spawn } from "child_process";
 import fetch from "node-fetch";
+import * as chalk from "chalk";
+import * as fkill from "fkill";
+//import * as terminate from "terminate";
 
 export * from "./interfaces";
 
@@ -48,20 +51,20 @@ export class Starter extends EventEmitter implements IStarter {
 
         this._logger.log("[HCL-Client] App starting ...");
 
-        this._logger.log(`[HCL-Client] Spawn command "${this._config.exec}", workdir "${this._full_cwd_path}"`);
+        this._logger.log(`[HCL-Client] Spawn command ${chalk.cyan(this._config.exec)}, workdir ${chalk.cyan(this._full_cwd_path)}`);
 
-        this._app = spawn(this._config.exec.trim(), [], {
+        this._app = spawn(this._config.exec.trim()/* "node", ["./tests/test_app.js"]*/, [], {
             cwd: this._full_cwd_path,
             env: process.env,
             stdio: ["inherit", "inherit", "inherit"],
             shell: true
         });
 
-        this._app.on("close", (code) => {
+        this._app.on("exit", (code) => {
 
             this._closed_flag = true;
 
-            this._logger.log(`[HCL-Client] App closed, with code "${code}"`, "dev");
+            this._logger.log(`[HCL-Client] App closed, with code ${chalk.cyan(code)}`, "dev");
 
             if (this._stopping_flag === true) {
                 return;
@@ -76,13 +79,17 @@ export class Starter extends EventEmitter implements IStarter {
                 this.run();
             }, this._config.restart_interval * 1000);
 
+            this._logger.log(`[HCL-Client] App restart after ${chalk.gray(this._config.restart_interval)} sec`);
+
         });
 
         this._app.on("error", (error) => {
-            this._logger.error("[HCL-Client] Starting app error.");
+            this._logger.error("[HCL-Client] Starting app error");
             this._logger.log(error);
             this.emit("error");
         });
+
+        this._logger.log(`[HCL-Client] App started ${chalk.cyan(this._app.pid)}`, "dev");
 
     }
 
@@ -100,7 +107,12 @@ export class Starter extends EventEmitter implements IStarter {
 
         clearTimeout(this._id_interval);
 
-        this._app.kill();
+        this._logger.log(`[HCL-Client] Kill process pid ${chalk.cyan(this._app.pid)}`, "debug");
+
+        fkill(this._app.pid, {
+            force: true,
+            tree: true
+        });
 
     }
 
@@ -123,7 +135,11 @@ export class Starter extends EventEmitter implements IStarter {
             });
 
         } else {
-            this._app.kill();
+            this._logger.log(`[HCL-Client] Kill process pid ${chalk.cyan(this._app.pid)}`, "debug");
+            fkill(this._app.pid, {
+                force: true,
+                tree: true
+            });
         }
 
     }

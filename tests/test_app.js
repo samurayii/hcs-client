@@ -34,6 +34,8 @@ server.listen(port, hostname, () => {
 });
 
 process.on("SIGTERM", () => {
-    console.log("💀 Termination signal received 💀");
-    process.exit();
+    console.log("Termination signal received");
+    setTimeout( () => {
+        process.exit();
+    }, 3000);
 });
