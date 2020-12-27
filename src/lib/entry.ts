@@ -22,6 +22,8 @@ program.option("-up, --update", "Flag for watch targets update (Environment vari
 program.option("-cr, --critical", "Flag for critical process (Environment variable: HCS_CLIENT_CRITICAL=(true|false)).", false);
 program.option("-l, --logs <type>", "Logs details, can be prod, dev or debug (Environment variable: HCS_CLIENT_LOGS=<type>). Example: --logs prod", "prod");
 program.option("-k, --keys [letters...]", "String/array path to keys file. (Environment variable: HCS_CLIENT_KEYS=<string[]>). Example: --keys /keys.json /keys.toml");
+program.option("-s, --shell", "Flag shell mode (Environment variable: HCS_CLIENT_SHELL=(true|false)).", false);
+
 
 program.parse(process.argv);
 
@@ -34,6 +36,7 @@ const config: IAppConfig = {
     target: program.target,
     cwd: program.cwd,
     update: program.update,
+    shell: program.shell,
     logs: program.logs.toLowerCase(),
     keys: program.keys,
     critical: program.critical,
@@ -70,6 +73,13 @@ if (process.env["HCS_CLIENT_UPDATE"] !== undefined) {
         config.update = true;
     } else {
         config.update = false;
+    }
+}
+if (process.env["HCS_CLIENT_SHELL"] !== undefined) {
+    if (process.env["HCS_CLIENT_SHELL"].trim().toLowerCase() === "true") {
+        config.shell = true;
+    } else {
+        config.shell = false;
     }
 }
 if (process.env["HCS_CLIENT_CWD"] !== undefined) {

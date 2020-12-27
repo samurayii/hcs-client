@@ -7,7 +7,6 @@ import { spawn } from "child_process";
 import fetch from "node-fetch";
 import * as chalk from "chalk";
 import * as fkill from "fkill";
-//import * as terminate from "terminate";
 
 export * from "./interfaces";
 
@@ -53,11 +52,22 @@ export class Starter extends EventEmitter implements IStarter {
 
         this._logger.log(`[HCL-Client] Spawn command ${chalk.cyan(this._config.exec)}, workdir ${chalk.cyan(this._full_cwd_path)}`);
 
-        this._app = spawn(this._config.exec.trim()/* "node", ["./tests/test_app.js"]*/, [], {
+        let executer: string;
+        let args: string[] = [];
+
+        if (this._config.shell === true) {
+            executer = this._config.exec.trim();
+        } else {
+            args = this._config.exec.trim().split(" ");
+            executer = args[0];
+            args.splice(0, 1);
+        }
+
+        this._app = spawn(executer, args, {
             cwd: this._full_cwd_path,
             env: process.env,
             stdio: ["inherit", "inherit", "inherit"],
-            shell: true
+            shell: this._config.shell
         });
 
         this._app.on("exit", (code) => {
@@ -89,7 +99,7 @@ export class Starter extends EventEmitter implements IStarter {
             this.emit("error");
         });
 
-        this._logger.log(`[HCL-Client] App started ${chalk.cyan(this._app.pid)}`, "dev");
+        this._logger.log(`[HCL-Client] App started pid: ${chalk.cyan(this._app.pid)}`, "dev");
 
     }
 
@@ -109,10 +119,14 @@ export class Starter extends EventEmitter implements IStarter {
 
         this._logger.log(`[HCL-Client] Kill process pid ${chalk.cyan(this._app.pid)}`, "debug");
 
-        fkill(this._app.pid, {
-            force: true,
-            tree: true
-        });
+        if (this._config.shell === true) {
+            fkill(this._app.pid, {
+                force: true,
+                tree: true
+            });
+        } else {
+            this._app.kill("SIGTERM");
+        }
 
     }
 
@@ -136,10 +150,16 @@ export class Starter extends EventEmitter implements IStarter {
 
         } else {
             this._logger.log(`[HCL-Client] Kill process pid ${chalk.cyan(this._app.pid)}`, "debug");
-            fkill(this._app.pid, {
-                force: true,
-                tree: true
-            });
+
+            if (this._config.shell === true) {
+                fkill(this._app.pid, {
+                    force: true,
+                    tree: true
+                });
+            } else {
+                this._app.kill("SIGTERM");
+            }
+
         }
 
     }

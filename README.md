@@ -34,6 +34,7 @@
 -tm, --tmp | HCS_CLIENT_TMP | временная папка
 -c, --cwd | HCS_CLIENT_CWD | рабочая папка для приложения (необходим ключ **exec**)
 -up, --update | HCS_CLIENT_UPDATE | слежка за изменениями файлов  (необходим ключ **exec**)
+-s, --shell | HCS_CLIENT_SHELL | вызов дочернего процесса в оболочке ОС (необходим ключ **exec**)
 -cr, --critical | HCS_CLIENT_CRITICAL | флаг критического процесса, он не запуститься если не прошла первичная синхронизация (необходим ключ **exec**)
 -l, --logs | HCS_CLIENT_LOGS | уровень логов **prod**, **dev** или **debug** (по умолчанию prod)
 -k, --keys | HCS_CLIENT_KEYS | массив файлов ключей в формате json или toml. Переменые клиента имеют префикс **client.**

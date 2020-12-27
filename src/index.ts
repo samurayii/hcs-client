@@ -48,7 +48,8 @@ const bootstrap = async () => {
             exec: config.exec,
             cwd: config.cwd,
             restart_interval: config.restart_interval,
-            webhook: config.webhook
+            webhook: config.webhook,
+            shell: config.shell
         };
 
         const starter = new Starter(starter_config, logger);

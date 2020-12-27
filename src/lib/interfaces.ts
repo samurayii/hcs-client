@@ -7,6 +7,7 @@ export interface IAppConfig {
     target: string[]
     cwd: string
     update: boolean
+    shell: boolean
     keys: string[]
     logs: string,
     critical: boolean,
