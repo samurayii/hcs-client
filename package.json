@@ -64,7 +64,7 @@
         "fkill": "^7.0.1",
         "jtomler": "^0.3.6",
         "logger-flx": "^0.1.5",
-        "node-fetch": "^2.6.1"
+        "node-fetch": "^3.1.1"
     },
     "remover": {
         "target": "./package.json",
